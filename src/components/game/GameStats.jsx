@@ -1,33 +1,22 @@
-const GameStats = () => {
+export default function GameStats({
+  matched,
+  total,
+}) {
   return (
-    <div className="grid grid-cols-2 gap-4 w-full mt-6">
+    <div className="flex justify-between mt-2 text-white/70">
 
-      <div className="bg-base-200 rounded-2xl p-4 text-center">
+      <span>
 
-        <p className="text-gray-400">
-          Time
-        </p>
+        Matched
 
-        <h3 className="text-3xl font-bold">
-          00:00
-        </h3>
+      </span>
 
-      </div>
+      <span>
 
-      <div className="bg-base-200 rounded-2xl p-4 text-center">
+        {matched} / {total}
 
-        <p className="text-gray-400">
-          Moves
-        </p>
-
-        <h3 className="text-3xl font-bold">
-          0
-        </h3>
-
-      </div>
+      </span>
 
     </div>
   );
-};
-
-export default GameStats;
+}

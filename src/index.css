@@ -1,22 +1,121 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@theme {
-  --color-primary: #8b5cf6;
-  --color-secondary: #06b6d4;
-  --color-accent: #ec4899;
-}
-
 html,
 body,
-#root {
-  width: 100%;
-  min-height: 100%;
+#root{
+  width:100%;
+  min-height:100%;
 }
 
-body {
-  margin: 0;
-  overflow-x: hidden;
-  font-family: Inter, sans-serif;
-  background: #0b1020;
+body{
+  margin:0;
+  overflow-x:hidden;
+  background:#090B1F;
+  color:white;
+  font-family:"Poppins",sans-serif;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+:root{
+  --primary:#7C3AED;
+  --secondary:#06B6D4;
+  --accent:#EC4899;
+  --gold:#FBBF24;
+}
+
+.gradient-text{
+  background:linear-gradient(
+      90deg,
+      #EC4899,
+      #8B5CF6,
+      #06B6D4,
+      #FBBF24
+  );
+  background-size:300%;
+  color:transparent;
+  -webkit-background-clip:text;
+  animation:gradientMove 8s linear infinite;
+}
+
+@keyframes gradientMove{
+  from{
+      background-position:0%;
+  }
+  to{
+      background-position:300%;
+  }
+}
+
+.game-btn{
+  background:linear-gradient(
+      135deg,
+      #7C3AED,
+      #EC4899
+  );
+
+  color:white;
+
+  border:none;
+
+  box-shadow:
+      0 0 20px rgba(124,58,237,.45),
+      0 0 40px rgba(236,72,153,.25);
+
+  transition:.3s;
+}
+
+.game-btn:hover{
+  box-shadow:
+      0 0 35px rgba(124,58,237,.8),
+      0 0 60px rgba(236,72,153,.45);
+}
+
+.glass{
+  backdrop-filter:blur(18px);
+
+  background:rgba(255,255,255,.06);
+
+  border:1px solid rgba(255,255,255,.08);
+
+  border-radius:24px;
+}
+
+.neon-border{
+  border:2px solid rgba(139,92,246,.35);
+
+  box-shadow:
+      0 0 18px rgba(139,92,246,.25);
+}
+
+.float{
+  animation:float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+
+0%,100%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-15px);
+}
+
+}
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#8B5CF6;
+  border-radius:50px;
+}
+
+::-webkit-scrollbar-track{
+  background:#090B1F;
 }

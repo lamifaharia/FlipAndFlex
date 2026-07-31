@@ -1,13 +1,24 @@
-const ProgressBar = ({ matched = 0, total = 100 }) => {
-  const progress = (matched / total) * 100;
+import { motion } from "framer-motion";
 
+export default function ProgressBar({
+  value,
+}) {
   return (
-    <progress
-      className="progress progress-primary w-full mt-6"
-      value={progress}
-      max="100"
-    />
-  );
-};
+    <div className="glass rounded-full h-3 overflow-hidden">
 
-export default ProgressBar;
+      <motion.div
+        initial={{
+          width: 0,
+        }}
+        animate={{
+          width: `${value}%`,
+        }}
+        transition={{
+          duration: .6,
+        }}
+        className="h-full rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400"
+      />
+
+    </div>
+  );
+}

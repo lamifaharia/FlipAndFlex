@@ -1,11 +1,16 @@
 import { Outlet } from "react-router-dom";
+import AnimatedBackground from "../components/common/AnimatedBackground";
 
-const MainLayout = () => {
+export default function MainLayout() {
   return (
-    <main className="min-h-screen bg-[#0b1020] text-white">
-      <Outlet />
-    </main>
-  );
-};
+    <>
+      <AnimatedBackground />
 
-export default MainLayout;
+      <main className="relative min-h-screen text-white overflow-hidden">
+
+        <Outlet />
+
+      </main>
+    </>
+  );
+}
