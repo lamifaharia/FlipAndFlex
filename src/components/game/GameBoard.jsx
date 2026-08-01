@@ -2,23 +2,23 @@ import { motion } from "framer-motion";
 import Card from "./Card";
 
 const GameBoard = ({ cards, cols, onCardClick }) => {
+  const rows = cols ? Math.ceil(cards.length / cols) : 1;
+
+  // Dynamically size cards to fill the available board space
+  // based on how many columns/rows this level needs.
   const getCardSize = () => {
-    switch (cols) {
-      case 3:
-        return 95;
+    const base = {
+      3: 150,
+      4: 128,
+      5: 108,
+      6: 92,
+    };
 
-      case 4:
-        return 82;
+    const maxByCols = base[cols] ?? 100;
 
-      case 5:
-        return 68;
-
-      case 6:
-        return 56;
-
-      default:
-        return 70;
-    }
+    return `clamp(48px, min(${(90 / cols).toFixed(2)}vw, ${(
+      78 / rows
+    ).toFixed(2)}vh), ${maxByCols}px)`;
   };
 
   const cardSize = getCardSize();
@@ -27,34 +27,39 @@ const GameBoard = ({ cards, cols, onCardClick }) => {
     <motion.div
       initial={{
         opacity: 0,
-        y: 40,
+        y: 20,
       }}
       animate={{
         opacity: 1,
         y: 0,
       }}
       transition={{
-        duration: 0.6,
+        duration: 0.5,
       }}
-      className="relative mt-3 flex-1 flex justify-center items-center"
+      className="relative w-full h-full flex justify-center items-center"
     >
       {/* Outer Glow */}
 
-      <div className="absolute -inset-4 rounded-[42px] bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-cyan-400/20 blur-2xl" />
+      <div className="absolute inset-0 rounded-[32px] bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-cyan-400/20 blur-2xl" />
 
       {/* Board */}
 
       <div
         className="
           relative
-          rounded-[36px]
+          w-full
+          h-full
+          rounded-[28px]
           overflow-hidden
           border
           border-white/10
           bg-white/5
           backdrop-blur-2xl
           shadow-[0_20px_80px_rgba(0,0,0,.45)]
-          p-4
+          p-3
+          flex
+          items-center
+          justify-center
         "
       >
         {/* Decorative Glow */}
@@ -66,9 +71,9 @@ const GameBoard = ({ cards, cols, onCardClick }) => {
         {/* Grid */}
 
         <div
-          className="relative grid justify-center gap-2"
+          className="relative grid justify-center content-center gap-2.5"
           style={{
-            gridTemplateColumns: `repeat(${cols}, ${cardSize}px)`,
+            gridTemplateColumns: `repeat(${cols}, ${cardSize})`,
           }}
         >
           {cards.map((card) => (

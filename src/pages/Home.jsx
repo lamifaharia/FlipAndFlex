@@ -1,129 +1,95 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-
 import Navbar from "../components/common/Navbar";
 
 export default function Home() {
+  return (
+    <>
+      <Navbar />
 
-return(
+      <section className="min-h-[calc(100vh-56px)] flex items-center justify-center px-5">
 
-<>
+        <motion.div
+          initial={{ opacity: 0, scale: .9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: .5 }}
+          className="glass neon-border rounded-[35px] w-full max-w-xl p-10 text-center"
+        >
 
-<Navbar/>
+          <motion.h1
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            className="text-6xl md:text-7xl font-black leading-none"
+          >
+            <span className="gradient-text">FLIP</span>
+            <br />
+            <span className="text-white">AND</span>
+            <br />
+            <span className="text-cyan-300">FLEX</span>
+          </motion.h1>
 
-<section className="min-h-[calc(100vh-96px)] flex flex-col justify-center items-center text-center px-5">
+          <p className="text-white/60 mt-5">
+            Train your memory and complete all 25 levels.
+          </p>
 
-<motion.div
+          <Link
+            to="/levels"
+            className="game-btn w-full mt-10 py-5 rounded-2xl text-xl font-bold block pulse-glow"
+          >
+            ▶ PLAY GAME
+          </Link>
 
-initial={{opacity:0,y:-80}}
+          <p className="text-cyan-300 mt-4 font-semibold">
+            Continue • Level 1
+          </p>
 
-animate={{opacity:1,y:0}}
+          <div className="grid grid-cols-3 gap-4 mt-10">
 
-transition={{duration:1}}
+            <div className="glass rounded-2xl py-5">
+              <p className="text-3xl">⭐</p>
+              <h2 className="text-2xl font-bold text-white mt-2">0</h2>
+              <p className="text-white/50 text-sm">
+                Stars
+              </p>
+            </div>
 
-className="float"
+            <div className="glass rounded-2xl py-5">
+              <p className="text-3xl">🏆</p>
+              <h2 className="text-2xl font-bold text-white mt-2">
+                0 / 25
+              </h2>
+              <p className="text-white/50 text-sm">
+                Levels
+              </p>
+            </div>
 
->
+            <div className="glass rounded-2xl py-5">
+              <p className="text-3xl">🔥</p>
+              <h2 className="text-2xl font-bold text-white mt-2">
+                0
+              </h2>
+              <p className="text-white/50 text-sm">
+                Best
+              </p>
+            </div>
 
-<h1 className="text-7xl md:text-9xl font-black neonText">
+          </div>
 
-FLIP
+          <div className="flex justify-center gap-4 mt-10">
 
-</h1>
+            <button className="btn btn-circle btn-outline text-xl">
+              ⚙
+            </button>
 
-<h1 className="text-7xl md:text-9xl font-black text-white">
+            <button className="btn btn-circle btn-outline text-xl">
+              ?
+            </button>
 
-AND
+          </div>
 
-</h1>
+        </motion.div>
 
-<h1 className="text-7xl md:text-9xl font-black text-cyan-300">
-
-FLEX
-
-</h1>
-
-</motion.div>
-
-<motion.p
-
-initial={{opacity:0}}
-
-animate={{opacity:1}}
-
-transition={{delay:.7}}
-
-className="text-white/70 mt-10 text-xl max-w-xl leading-9"
-
->
-
-Train your brain with colorful memory challenges.
-
-Beat all <span className="text-yellow-400 font-bold">25 Levels</span>
-
-and become the Memory Master.
-
-</motion.p>
-
-<motion.div
-
-initial={{scale:0}}
-
-animate={{scale:1}}
-
-transition={{delay:1}}
-
-className="mt-16 flex gap-6 flex-wrap justify-center"
-
->
-
-<Link
-
-to="/levels"
-
-className="glowButton px-12 py-5 rounded-full text-2xl font-bold"
-
->
-
-▶ PLAY
-
-</Link>
-
-<button
-
-className="btn btn-outline rounded-full px-10 text-xl"
-
->
-
-How To Play
-
-</button>
-
-</motion.div>
-
-<motion.div
-
-animate={{
-y:[0,-15,0]
-}}
-
-transition={{
-repeat:Infinity,
-duration:2
-}}
-
-className="mt-24 text-white/40"
-
->
-
-▼
-
-</motion.div>
-
-</section>
-
-</>
-
-)
-
+      </section>
+    </>
+  );
 }

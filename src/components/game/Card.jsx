@@ -1,21 +1,35 @@
 import { motion } from "framer-motion";
 
 const Card = ({ card, size, onClick }) => {
+  const isInteractive = !card.flipped && !card.matched;
+
   return (
     <motion.div
       whileHover={
-        !card.flipped && !card.matched
+        isInteractive
           ? {
-              scale: 1.06,
+              scale: 1.07,
               y: -6,
+              rotate: [-1, 1, -1],
             }
           : {}
       }
-      whileTap={{ scale: 0.95 }}
+      whileTap={isInteractive ? { scale: 0.94 } : {}}
+      animate={
+        card.wrong
+          ? { x: [0, -8, 8, -8, 8, -4, 4, 0] }
+          : { x: 0 }
+      }
+      transition={
+        card.wrong
+          ? { duration: 0.45, ease: "easeInOut" }
+          : { duration: 0.3 }
+      }
       onClick={onClick}
       style={{
         width: size,
         height: size,
+        "--card-size": size,
         perspective: "1200px",
       }}
       className="cursor-pointer select-none"
@@ -23,14 +37,16 @@ const Card = ({ card, size, onClick }) => {
       <motion.div
         animate={{
           rotateY: card.flipped ? 180 : 0,
-          scale: card.matched ? [1, 1.12, 1] : 1,
+          scale: card.matched ? [1, 1.14, 1] : 1,
         }}
         transition={{
           rotateY: {
-            duration: 0.45,
+            duration: 0.55,
+            ease: [0.34, 1.56, 0.64, 1],
           },
           scale: {
-            duration: 0.4,
+            duration: 0.5,
+            ease: "easeOut",
           },
         }}
         className="relative w-full h-full"
@@ -118,7 +134,8 @@ const Card = ({ card, size, onClick }) => {
               repeat: Infinity,
               duration: 1.4,
             }}
-            className="relative text-white text-3xl font-black drop-shadow-xl"
+            className="relative text-white font-black drop-shadow-xl"
+            style={{ fontSize: "calc(var(--card-size) * 0.38)" }}
           >
             ?
           </motion.span>
@@ -126,10 +143,26 @@ const Card = ({ card, size, onClick }) => {
 
         {/* BACK */}
 
-        <div
+        <motion.div
           style={{
             transform: "rotateY(180deg)",
             backfaceVisibility: "hidden",
+          }}
+          animate={
+            card.matched
+              ? {
+                  boxShadow: [
+                    "0 0 0px rgba(74,222,128,0.0)",
+                    "0 0 28px rgba(74,222,128,0.85)",
+                    "0 0 10px rgba(74,222,128,0.4)",
+                  ],
+                }
+              : { boxShadow: "0 0 0px rgba(74,222,128,0)" }
+          }
+          transition={{
+            repeat: card.matched ? Infinity : 0,
+            duration: 1.2,
+            ease: "easeInOut",
           }}
           className={`
           absolute
@@ -174,7 +207,8 @@ const Card = ({ card, size, onClick }) => {
               repeat: card.matched ? Infinity : 0,
               duration: 0.8,
             }}
-            className="relative z-10 text-4xl font-black text-gray-800"
+            className="relative z-10 font-black text-gray-800"
+            style={{ fontSize: "calc(var(--card-size) * 0.32)" }}
           >
             {card.value}
           </motion.div>
@@ -191,12 +225,13 @@ const Card = ({ card, size, onClick }) => {
                 repeat: Infinity,
                 duration: 1,
               }}
-              className="mt-2 text-green-600 text-xl"
+              className="mt-2 text-green-600"
+              style={{ fontSize: "calc(var(--card-size) * 0.16)" }}
             >
               ✓
             </motion.div>
           )}
-        </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );

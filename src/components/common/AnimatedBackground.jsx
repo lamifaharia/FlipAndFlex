@@ -1,9 +1,57 @@
 import { motion } from "framer-motion";
-
-const stars = Array.from({ length: 80 });
-const particles = Array.from({ length: 24 });
+import { useEffect, useState } from "react";
 
 export default function AnimatedBackground() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const updateMq = () => setIsMobile(mq.matches);
+    const updateMotion = () => setReducedMotion(motionQuery.matches);
+
+    updateMq();
+    updateMotion();
+
+    mq.addEventListener("change", updateMq);
+    motionQuery.addEventListener("change", updateMotion);
+
+    return () => {
+      mq.removeEventListener("change", updateMq);
+      motionQuery.removeEventListener("change", updateMotion);
+    };
+  }, []);
+
+  const starCount = isMobile ? 40 : 80;
+  const particleCount = isMobile ? 12 : 24;
+  const orbBlur = isMobile ? 100 : 170;
+  const shootingStarCount = isMobile ? 3 : 6;
+
+  const stars = Array.from({ length: starCount });
+  const particles = Array.from({ length: particleCount });
+
+  // Respect reduced-motion: render a calm static background, no orbs/particles/rings.
+  if (reducedMotion) {
+    return (
+      <div className="fixed inset-0 overflow-hidden -z-50 bg-[#090B1F]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#090B1F] via-[#131B38] to-[#060714]" />
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+            linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)
+          `,
+            backgroundSize: "60px 60px",
+          }}
+        />
+        <div className="absolute inset-0 bg-black/25" />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 overflow-hidden -z-50 bg-[#090B1F]">
 
@@ -12,7 +60,8 @@ export default function AnimatedBackground() {
 
       {/* Purple Orb */}
       <motion.div
-        className="absolute w-[650px] h-[650px] rounded-full bg-purple-600/25 blur-[170px] -left-52 -top-52"
+        className="absolute w-[650px] h-[650px] rounded-full bg-purple-600/25 -left-52 -top-52"
+        style={{ filter: `blur(${orbBlur}px)` }}
         animate={{
           x: [-60, 80, -60],
           y: [-40, 60, -40],
@@ -27,7 +76,8 @@ export default function AnimatedBackground() {
 
       {/* Cyan Orb */}
       <motion.div
-        className="absolute w-[700px] h-[700px] rounded-full bg-cyan-500/20 blur-[180px] -right-60 bottom-[-250px]"
+        className="absolute w-[700px] h-[700px] rounded-full bg-cyan-500/20 -right-60 bottom-[-250px]"
+        style={{ filter: `blur(${orbBlur + 10}px)` }}
         animate={{
           x: [70, -70, 70],
           y: [40, -50, 40],
@@ -42,7 +92,8 @@ export default function AnimatedBackground() {
 
       {/* Pink Orb */}
       <motion.div
-        className="absolute w-[350px] h-[350px] rounded-full bg-pink-500/20 blur-[140px] left-1/2 top-1/2"
+        className="absolute w-[350px] h-[350px] rounded-full bg-pink-500/20 left-1/2 top-1/2"
+        style={{ filter: `blur(${orbBlur - 30}px)` }}
         animate={{
           x: [-120, 120, -120],
           y: [70, -70, 70],
@@ -56,7 +107,7 @@ export default function AnimatedBackground() {
 
       {/* Rotating Ring */}
       <motion.div
-        className="absolute left-1/2 top-1/2 w-[900px] h-[900px] rounded-full border border-white/5"
+        className="absolute left-1/2 top-1/2 w-[900px] h-[900px] rounded-full border border-white/5 hidden sm:block"
         style={{
           marginLeft: "-450px",
           marginTop: "-450px",
@@ -73,7 +124,7 @@ export default function AnimatedBackground() {
 
       {/* Second Ring */}
       <motion.div
-        className="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full border border-cyan-400/10"
+        className="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full border border-cyan-400/10 hidden sm:block"
         style={{
           marginLeft: "-300px",
           marginTop: "-300px",
@@ -153,7 +204,7 @@ export default function AnimatedBackground() {
       ))}
 
       {/* Tiny Shooting Stars */}
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: shootingStarCount }).map((_, i) => (
         <motion.div
           key={`shoot-${i}`}
           className="absolute h-[2px] rounded-full"

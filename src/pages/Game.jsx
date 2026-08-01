@@ -1,3 +1,4 @@
+import saveBestScore from "../utils/saveBestScore";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -12,19 +13,12 @@ import GameBoard from "../components/game/GameBoard";
 import GameControls from "../components/game/GameControls";
 import WinModal from "../components/game/WinModal";
 
-import flipSound from "../assets/sounds/flip.mp3";
-import matchSound from "../assets/sounds/match.mp3";
-import wrongSound from "../assets/sounds/wrong.mp3";
-import winSound from "../assets/sounds/win.mp3";
-
-import playSound from "../utils/playSound.js";
-
 const Game = () => {
   const { level } = useParams();
 
   const currentLevel = useMemo(
     () => levels.find((item) => item.id === Number(level)),
-    [level]
+    [level],
   );
 
   // =======================
@@ -40,7 +34,8 @@ const Game = () => {
 
   const [seconds, setSeconds] = useState(0);
 
-  const [soundOn, setSoundOn] = useState(true);
+  const [stars, setStars] = useState(3);
+
 
   // =======================
   // INITIALIZE LEVEL
@@ -57,13 +52,14 @@ const Game = () => {
     setWon(false);
     setSeconds(0);
     setCanPlay(false);
+    setStars(3);
 
     const preview = setTimeout(() => {
       setCards((prev) =>
         prev.map((card) => ({
           ...card,
           flipped: false,
-        }))
+        })),
       );
 
       setCanPlay(true);
@@ -103,7 +99,7 @@ const Game = () => {
       prev.map((card) => ({
         ...card,
         flipped: true,
-      }))
+      })),
     );
 
     setTimeout(() => {
@@ -111,16 +107,13 @@ const Game = () => {
         prev.map((card) => ({
           ...card,
           flipped: card.matched,
-        }))
+        })),
       );
 
       setCanPlay(true);
     }, 1000);
   };
 
-  const toggleSound = () => {
-    setSoundOn((prev) => !prev);
-  };
 
   // =======================
   // PROGRESS
@@ -129,212 +122,208 @@ const Game = () => {
   const matchedCount = cards.filter((card) => card.matched).length;
 
   const totalMatchCards = cards.filter(
-    (card) => card.value !== currentLevel?.centerCard
+    (card) => card.value !== currentLevel?.centerCard,
   ).length;
 
   const progress =
     totalMatchCards === 0
       ? 0
       : Math.round((matchedCount / totalMatchCards) * 100);
-      // =======================
-// CARD CLICK
-// =======================
-
-const handleCardClick = (id) => {
-  if (!canPlay) return;
-
-  const clickedCard = cards.find((card) => card.id === id);
-
-  if (!clickedCard) return;
-
-  if (clickedCard.flipped || clickedCard.matched) return;
-
-  if (selectedCards.length === 2) return;
-
-  // Flip selected card
-  const updatedCards = cards.map((card) =>
-    card.id === id
-      ? {
-          ...card,
-          flipped: true,
-        }
-      : card
-  );
-
-  setCards(updatedCards);
-
-  // Play flip sound
-  playSound(flipSound, soundOn);
-
-  const newSelection = [...selectedCards, id];
-
-  setSelectedCards(newSelection);
-
-  if (newSelection.length !== 2) return;
-
-  setCanPlay(false);
-  setMoves((prev) => prev + 1);
-
-  const first = updatedCards.find(
-    (card) => card.id === newSelection[0]
-  );
-
-  const second = updatedCards.find(
-    (card) => card.id === newSelection[1]
-  );
 
   // =======================
-  // MATCH
+  // CARD CLICK
   // =======================
 
-  if (first.value === second.value) {
-    playSound(matchSound, soundOn);
+  const handleCardClick = (id) => {
+    if (!canPlay) return;
 
-    setTimeout(() => {
-      const matchedCards = updatedCards.map((card) => {
-        if (
-          card.id === first.id ||
-          card.id === second.id
-        ) {
-          return {
+    const clickedCard = cards.find((card) => card.id === id);
+
+    if (!clickedCard) return;
+
+    if (clickedCard.flipped || clickedCard.matched) return;
+
+    if (selectedCards.length === 2) return;
+
+    // Flip selected card
+    const updatedCards = cards.map((card) =>
+      card.id === id
+        ? {
             ...card,
-            matched: true,
-          };
-        }
+            flipped: true,
+          }
+        : card,
+    );
 
-        return card;
-      });
+    setCards(updatedCards);
 
-      setCards(matchedCards);
-      setSelectedCards([]);
-      setCanPlay(true);
+    // Play flip sound
 
-      const finished = matchedCards.every(
-        (card) =>
-          card.matched ||
-          card.value === currentLevel.centerCard
-      );
+    const newSelection = [...selectedCards, id];
 
-      if (finished) {
-        playSound(winSound, soundOn);
+    setSelectedCards(newSelection);
 
-        setWon(true);
+    if (newSelection.length !== 2) return;
 
-        const highest =
-          Number(localStorage.getItem("highestLevel")) || 1;
+    setCanPlay(false);
+    setMoves((prev) => prev + 1);
 
-        if (currentLevel.id >= highest) {
-          localStorage.setItem(
-            "highestLevel",
-            currentLevel.id + 1
-          );
-        }
-      }
-    }, 400);
-  }
+    const first = updatedCards.find((card) => card.id === newSelection[0]);
 
-  // =======================
-  // WRONG MATCH
-  // =======================
+    const second = updatedCards.find((card) => card.id === newSelection[1]);
 
-  else {
-    playSound(wrongSound, soundOn);
+    // =======================
+    // MATCH
+    // =======================
 
-    setTimeout(() => {
-      setCards((prev) =>
-        prev.map((card) => {
-          if (
-            card.id === first.id ||
-            card.id === second.id
-          ) {
+    if (first.value === second.value) {
+
+      setTimeout(() => {
+        const matchedCards = updatedCards.map((card) => {
+          if (card.id === first.id || card.id === second.id) {
             return {
               ...card,
-              flipped: false,
+              matched: true,
             };
           }
 
           return card;
-        })
-      );
+        });
 
-      setSelectedCards([]);
-      setCanPlay(true);
-    }, 700);
+        setCards(matchedCards);
+        setSelectedCards([]);
+        setCanPlay(true);
+
+        const finished = matchedCards.every(
+          (card) => card.matched || card.value === currentLevel.centerCard,
+        );
+
+        if (finished) {
+
+          let earnedStars = 3;
+
+          if (moves + 1 > 25 || seconds > 90) {
+            earnedStars = 1;
+          } else if (moves + 1 > 18 || seconds > 60) {
+            earnedStars = 2;
+          }
+
+          setStars(earnedStars);
+
+          saveBestScore(
+            currentLevel.id,
+            moves + 1,
+            seconds,
+            earnedStars
+          );
+
+          setWon(true);
+
+          const highest =
+            Number(localStorage.getItem("highestLevel")) || 1;
+
+          if (currentLevel.id >= highest) {
+            localStorage.setItem(
+              "highestLevel",
+              currentLevel.id + 1
+            );
+          }
+        }
+      }, 500);
+    }
+
+    // =======================
+    // WRONG MATCH
+    // =======================
+    else {
+
+      setTimeout(() => {
+        setCards((prev) =>
+          prev.map((card) => {
+            if (card.id === first.id || card.id === second.id) {
+              return {
+                ...card,
+                flipped: false,
+              };
+            }
+
+            return card;
+          }),
+        );
+
+        setSelectedCards([]);
+        setCanPlay(true);
+      }, 700);
+    }
+  };
+
+  // =======================
+  // LEVEL NOT FOUND
+  // =======================
+
+  if (!currentLevel) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-5xl font-black text-white">
+        Level Not Found
+      </div>
+    );
   }
-};
 
-// =======================
-// LEVEL NOT FOUND
-// =======================
+  // =======================
+  // TIME FORMAT
+  // =======================
 
-if (!currentLevel) {
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const secs = String(seconds % 60).padStart(2, "0");
+
+  // =======================
+  // UI
+  // =======================
+
   return (
-    <div className="min-h-screen flex items-center justify-center text-5xl font-black text-white">
-      Level Not Found
-    </div>
-  );
-}
+    <>
+      <Navbar />
 
-// =======================
-// TIME FORMAT
-// =======================
+      <section className="max-w-6xl mx-auto px-3 py-2 h-[calc(100vh-70px)] flex flex-col gap-2">
+        <div className="glass neon-border rounded-2xl px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+          <GameHeader
+            level={currentLevel.id}
+            moves={moves}
+            time={`${minutes}:${secs}`}
+          />
 
-const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
-const secs = String(seconds % 60).padStart(2, "0");
+          <GameControls
+            onHint={handleHint}
+            onRestart={handleRestart}
+          />
+        </div>
 
-// =======================
-// UI
-// =======================
+        <div className="glass neon-border rounded-2xl px-4 py-2 flex items-center gap-4">
+          <div className="flex-1">
+            <ProgressBar value={progress} />
+          </div>
+          <GameStats matched={matchedCount / 2} total={totalMatchCards / 2} />
+        </div>
 
-return (
-  <>
-    <Navbar />
-
-    <section className="max-w-6xl mx-auto px-4 py-3 h-[calc(100vh-90px)] flex flex-col">
-
-      <GameHeader
-        level={currentLevel.id}
-        moves={moves}
-        time={`${minutes}:${secs}`}
-      />
-
-      <div className="glass neon-border rounded-[30px] p-4 mt-3 flex-1 flex flex-col overflow-hidden">
-
-        <ProgressBar value={progress} />
-
-        <GameStats
-          matched={matchedCount / 2}
-          total={totalMatchCards / 2}
-        />
-
-        <GameControls
-          onHint={handleHint}
-          onRestart={handleRestart}
-          soundOn={soundOn}
-          toggleSound={toggleSound}
-        />
-
-        <div className="flex-1 flex items-center justify-center overflow-auto py-3">
-
+        <div className="glass neon-border rounded-2xl p-2 flex-1 flex items-center justify-center overflow-hidden">
           <GameBoard
             cards={cards}
             cols={currentLevel.cols}
             onCardClick={handleCardClick}
           />
-
         </div>
+      </section>
 
-      </div>
-
-    </section>
-
-    {won && (
-      <WinModal
-        level={currentLevel.id}
-      />
-    )}
-  </>
-);
+      {won && (
+        <WinModal
+          level={currentLevel.id}
+          moves={moves}
+          time={seconds}
+          stars={stars}
+        />
+      )}
+    </>
+  );
 };
 
 export default Game;

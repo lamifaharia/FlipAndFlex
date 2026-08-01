@@ -14,6 +14,7 @@ body{
   background:#090B1F;
   color:white;
   font-family:"Poppins",sans-serif;
+  font-size:var(--fs-base);
 }
 
 *{
@@ -25,6 +26,25 @@ body{
   --secondary:#06B6D4;
   --accent:#EC4899;
   --gold:#FBBF24;
+
+  /* ===========================
+     GLOBAL FONT SCALE
+     Fluid clamp() sizes so text scales
+     smoothly with viewport instead of
+     jumping between fixed breakpoints.
+  =========================== */
+  --fs-xs: clamp(0.68rem, 0.64rem + 0.2vw, 0.75rem);
+  --fs-sm: clamp(0.78rem, 0.73rem + 0.25vw, 0.875rem);
+  --fs-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --fs-lg: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --fs-xl: clamp(1.3rem, 1.15rem + 0.75vw, 1.75rem);
+  --fs-2xl: clamp(1.6rem, 1.3rem + 1.5vw, 2.25rem);
+  --fs-3xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+
+  /* Glass/neon tuning knobs, overridden in the mobile
+     media query below for responsiveness */
+  --glass-blur: 18px;
+  --neon-opacity: 1;
 }
 
 .gradient-text{
@@ -74,21 +94,70 @@ body{
       0 0 60px rgba(236,72,153,.45);
 }
 
+/* ===========================
+   GLASS EFFECT
+   Same class name/behavior, richer depth:
+   saturate() boost + inner highlight so
+   panels feel like actual frosted glass
+   instead of a flat tint.
+=========================== */
 .glass{
-  backdrop-filter:blur(18px);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
 
   background:rgba(255,255,255,.06);
 
   border:1px solid rgba(255,255,255,.08);
 
   border-radius:24px;
+
+  box-shadow:
+      0 8px 32px rgba(0,0,0,.35),
+      inset 0 1px 0 rgba(255,255,255,.08);
 }
 
+/* ===========================
+   NEON BORDER
+   Kept the static glow you had, added an
+   animated gradient sheen layered on top
+   via ::before so it reads as "neon" (alive)
+   rather than a fixed purple outline.
+=========================== */
 .neon-border{
+  position:relative;
   border:2px solid rgba(139,92,246,.35);
 
   box-shadow:
       0 0 18px rgba(139,92,246,.25);
+}
+
+.neon-border::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(
+      120deg,
+      var(--primary),
+      var(--accent),
+      var(--secondary)
+  );
+  background-size:200% 200%;
+  -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:calc(.45 * var(--neon-opacity));
+  animation:neonFlow 6s ease infinite;
+  pointer-events:none;
+}
+
+@keyframes neonFlow{
+  0%   { background-position:0% 50%; }
+  50%  { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
 }
 
 .float{
@@ -107,6 +176,47 @@ transform:translateY(-15px);
 
 }
 
+/* ===========================
+   REUSABLE ANIMATIONS
+   Shared utility classes so components
+   (cards, badges, panels) can reuse the
+   same motion vocabulary instead of each
+   defining one-off keyframes.
+=========================== */
+@keyframes pulseGlow{
+  0%,100%{ box-shadow:0 0 0px rgba(74,222,128,0); }
+  50%    { box-shadow:0 0 28px rgba(74,222,128,.85); }
+}
+.pulse-glow{
+  animation:pulseGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes shakeX{
+  0%,100%{ transform:translateX(0); }
+  20%    { transform:translateX(-8px); }
+  40%    { transform:translateX(8px); }
+  60%    { transform:translateX(-4px); }
+  80%    { transform:translateX(4px); }
+}
+.shake{
+  animation:shakeX .45s ease-in-out;
+}
+
+@keyframes shimmer{
+  from{ transform:translateX(-120%); }
+  to  { transform:translateX(140%); }
+}
+.shimmer{
+  animation:shimmer 2.4s linear infinite;
+}
+
+@keyframes spinSlow{
+  to{ transform:rotate(360deg); }
+}
+.spin-slow{
+  animation:spinSlow 60s linear infinite;
+}
+
 ::-webkit-scrollbar{
   width:8px;
 }
@@ -118,4 +228,35 @@ transform:translateY(-15px);
 
 ::-webkit-scrollbar-track{
   background:#090B1F;
+}
+
+/* ===========================
+   RESPONSIVENESS
+=========================== */
+@media (max-width:768px){
+  :root{
+    --glass-blur:12px;
+    --neon-opacity:.7;
+  }
+
+  .glass{
+    border-radius:18px;
+  }
+}
+
+@media (max-width:480px){
+  :root{
+    --glass-blur:8px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .gradient-text,
+  .neon-border::before,
+  .float,
+  .pulse-glow,
+  .shimmer,
+  .spin-slow{
+    animation:none;
+  }
 }
