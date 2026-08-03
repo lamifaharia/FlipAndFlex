@@ -1,8 +1,40 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+
 import Navbar from "../components/common/Navbar";
+import Loading from "./Loading";
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  const highestLevel =
+    Number(localStorage.getItem("highestLevel")) || 1;
+
+  const completedLevels = Math.max(highestLevel - 1, 0);
+
+  let totalStars = 0;
+
+  for (let i = 1; i <= 25; i++) {
+    const score = JSON.parse(localStorage.getItem(`level-${i}`));
+
+    if (score) {
+      totalStars += score.stars || 0;
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -40,14 +72,16 @@ export default function Home() {
           </Link>
 
           <p className="text-cyan-300 mt-4 font-semibold">
-            Continue • Level 1
+            Continue • Level {highestLevel}
           </p>
 
           <div className="grid grid-cols-3 gap-4 mt-10">
 
             <div className="glass rounded-2xl py-5">
               <p className="text-3xl">⭐</p>
-              <h2 className="text-2xl font-bold text-white mt-2">0</h2>
+              <h2 className="text-2xl font-bold text-white mt-2">
+                {totalStars}
+              </h2>
               <p className="text-white/50 text-sm">
                 Stars
               </p>
@@ -56,7 +90,7 @@ export default function Home() {
             <div className="glass rounded-2xl py-5">
               <p className="text-3xl">🏆</p>
               <h2 className="text-2xl font-bold text-white mt-2">
-                0 / 25
+                {completedLevels} / 25
               </h2>
               <p className="text-white/50 text-sm">
                 Levels
@@ -66,10 +100,10 @@ export default function Home() {
             <div className="glass rounded-2xl py-5">
               <p className="text-3xl">🔥</p>
               <h2 className="text-2xl font-bold text-white mt-2">
-                0
+                {highestLevel}
               </h2>
               <p className="text-white/50 text-sm">
-                Best
+                Highest
               </p>
             </div>
 
